@@ -1,6 +1,6 @@
 [package]
 name = "android-rust-cli"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 description = "A CLI tool for generating Android Rust JNI templates in a single command"
 license = "MIT OR Apache-2.0"
@@ -10,12 +10,17 @@ keywords = ["android", "rust", "jni", "cli", "template"]
 categories = ["development-tools", "command-line-utilities"]
 
 [dependencies]
-anyhow = "1.0.100"
-clap = { version = "4.5.54", features = ["derive"] }
-dialoguer = "0.12.0"
-include_dir = "0.7.4"
-minijinja = "2.14.0"
-serde = { version = "1.0.228", features = ["derive"] }
+anyhow = "1.0"
+clap = { version = "4.5", features = ["derive"] }
+clap_complete = "4.5"
+console = "0.15"
+dialoguer = "0.12"
+include_dir = "0.7"
+indicatif = "0.17"
+minijinja = "2.14"
+serde = { version = "1.0", features = ["derive"] }
+thiserror = "2.0"
+toml = "0.8"
 
 [[bin]]
 name = "android-rust"
@@ -30,7 +35,7 @@ strip = true
 debug = false
 overflow-checks = false
 
-[profile.release.package."*"] 
+[profile.release.package."*"]
 opt-level = 3
 codegen-units = 1
 strip = true
