@@ -131,6 +131,8 @@ fn rewrite_relative_path<P: AsRef<Path>>(path: P, package_path: &str) -> PathBuf
             for sub in package_path.split('/') {
                 out.push(sub);
             }
+        } else if part_str == "Cargo.toml.template" {
+            out.push("Cargo.toml");
         } else {
             out.push(part);
         }
