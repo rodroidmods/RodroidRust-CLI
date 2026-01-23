@@ -2,6 +2,12 @@
 name = "android-rust-cli"
 version = "0.1.0"
 edition = "2024"
+description = "A CLI tool for generating Android Rust JNI templates in a single command"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com"
+readme = "README.md"
+keywords = ["android", "rust", "jni", "cli", "template"]
+categories = ["development-tools", "command-line-utilities"]
 
 [dependencies]
 anyhow = "1.0.100"
