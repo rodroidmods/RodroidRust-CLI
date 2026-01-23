@@ -16,7 +16,7 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
-    #[command(alias = "init", about = "Create a new project from a template")]
+    #[command(about = "Create a new project from a template")]
     New {
         #[arg(
             value_name = "NAME",
@@ -41,6 +41,32 @@ pub enum Commands {
         package_name: Option<String>,
 
         #[arg(long, help = "Overwrite files if the target directory is not empty")]
+        force: bool,
+
+        #[arg(long, help = "Show what would be created without writing files")]
+        dry_run: bool,
+    },
+
+    #[command(about = "Initialize project in current directory")]
+    Init {
+        #[arg(
+            long,
+            default_value = "standard",
+            value_name = "TEMPLATE",
+            help = "Template name to use (default: standard)"
+        )]
+        template: Option<String>,
+
+        #[arg(long = "template-path", help = "Use templates from a custom directory")]
+        template_path: Option<PathBuf>,
+
+        #[arg(
+            long = "package-name",
+            help = "Android package/namespace (e.g. com.example.app)"
+        )]
+        package_name: Option<String>,
+
+        #[arg(long, help = "Overwrite files if the current directory is not empty")]
         force: bool,
 
         #[arg(long, help = "Show what would be created without writing files")]

@@ -21,6 +21,13 @@ fn main() -> Result<()> {
             force,
             dry_run,
         } => commands::new_project(name, template, template_path, package_name, force, dry_run),
+        Commands::Init {
+            template,
+            template_path,
+            package_name,
+            force,
+            dry_run,
+        } => commands::init_project(template, template_path, package_name, force, dry_run),
         Commands::ListTemplates { template_path } => commands::list_templates(template_path),
         Commands::Doctor => commands::run_doctor(),
         Commands::Completions { shell } => commands::generate_completions(shell),

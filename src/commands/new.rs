@@ -23,9 +23,53 @@ pub fn new_project(
     force: bool,
     dry_run: bool,
 ) -> Result<()> {
-    ui::print_banner();
-
     let out_dir = name.unwrap_or_else(|| PathBuf::from("android-rust-example"));
+    create_project(
+        out_dir,
+        template,
+        template_path,
+        package_name,
+        force,
+        dry_run,
+    )
+}
+
+pub fn init_project(
+    template: Option<String>,
+    template_path: Option<PathBuf>,
+    package_name: Option<String>,
+    force: bool,
+    dry_run: bool,
+) -> Result<()> {
+    let out_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+
+    // Default to "standard" if no template specified for init
+    // But we still allow selection if multiple available or if prompt needed?
+    // We can infer this in the resolution logic or pass a preference.
+    // For now let's keep it consistent: prompt if unsure, but if template is None, maybe default to standard?
+
+    // Actually, `resolve_template` defaults to standard if it's the only one OR non-interactive.
+    // Let's pass the template through.
+
+    create_project(
+        out_dir,
+        template,
+        template_path,
+        package_name,
+        force,
+        dry_run,
+    )
+}
+
+fn create_project(
+    out_dir: PathBuf,
+    template: Option<String>,
+    template_path: Option<PathBuf>,
+    package_name: Option<String>,
+    force: bool,
+    dry_run: bool,
+) -> Result<()> {
+    ui::print_banner();
 
     if !dry_run {
         prepare_output_dir(&out_dir, force)?;
@@ -77,7 +121,8 @@ pub fn new_project(
     pb.finish_and_clear();
 
     let canonical_path = out_dir.canonicalize().unwrap_or(out_dir.clone());
-    let display_path = canonical_path.to_string_lossy().replace(r"\\?\", "");
+    let display_path = canonical_path.to_string_lossy().replace(r"\\?\", ""); // Fix Windows prefix
+
     ui::print_completion_message(&display_path, &package_name);
 
     Ok(())

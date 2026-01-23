@@ -25,6 +25,9 @@ A command-line tool for scaffolding Android projects with Rust JNI integration. 
 
 ## Installation
 
+> [!IMPORTANT]
+> Please use version **0.3.0** or later. Previous versions had issues with packaging (missing files on crates.io).
+
 ```bash
 cargo install android-rust-cli
 ```
@@ -34,6 +37,9 @@ cargo install android-rust-cli
 ```bash
 # Create a new project (interactive mode)
 android-rust new my-app
+
+# Initialize in current directory
+android-rust init
 
 # Specify template and package name
 android-rust new my-app --template standard --package-name com.example.app
@@ -60,6 +66,22 @@ android-rust new <name> [OPTIONS]
 | `--template-path <PATH>` | Use custom templates from directory |
 | `--force` | Overwrite existing files |
 | `--dry-run` | Preview without creating files |
+
+### `init` — Initialize in Current Directory
+
+```bash
+android-rust init [OPTIONS]
+```
+
+Initialize a new project directly in the current directory.
+
+```bash
+# Init with standard template (default)
+android-rust init
+
+# Init with specific template
+android-rust init --template multi-module
+```
 
 ### `list-templates` — View Available Templates
 
