@@ -1,6 +1,6 @@
 [package]
 name = "android-rust-cli"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2024"
 authors = ["RodroidMods"]
 description = "A CLI tool for generating Android Rust JNI templates in a single command"
