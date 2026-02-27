@@ -81,7 +81,7 @@ fn get_fallback_description(name: &str) -> &'static str {
     match name {
         "standard" => "Basic Android + Rust JNI project with single module",
         "multi-module" => "Clean architecture with separate app, domain, and data modules",
-        "bottom-nav" => "Bottom navigation layout with Jetpack Compose",
+        "kmp-mobile" => "Kotlin Multiplatform (Android + iOS) with Rust via JNI and C FFI",
         _ => "Custom template",
     }
 }

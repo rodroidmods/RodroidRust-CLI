@@ -1,6 +1,6 @@
 # Android Rust CLI
 
-A command-line tool for scaffolding Android projects with Rust JNI integration. Generate production-ready project templates with customizable package names and support for multiple architectural patterns.
+A command-line tool for scaffolding Android and Kotlin Multiplatform projects with Rust integration. Generate production-ready project templates with customizable package names, JNI bindings, and iOS C FFI support.
 
 ```
    ╭──────────────────────────────────────────╮
@@ -15,18 +15,21 @@ A command-line tool for scaffolding Android projects with Rust JNI integration. 
 ## Features
 
 - **Instant Project Setup** — Create fully-configured Android + Rust projects in seconds
-- **Multiple Templates** — Standard, multi-module, and bottom navigation layouts
-- **Smart Package Management** — Automatic package name substitution across Java/Kotlin and Rust
+- **Multiple Templates** — Standard, multi-module, and KMP (Kotlin Multiplatform) layouts
+- **KMP Support** — Kotlin Multiplatform template with Rust integration for both Android (JNI) and iOS (C FFI)
+- **Interactive Prompts** — Project name, template, and package name are prompted interactively
+- **Smart Package Management** — Automatic package name substitution across Kotlin, Rust, Gradle, and Xcode configs
 - **Environment Diagnostics** — `doctor` command checks your toolchain setup
 - **Shell Completions** — Full support for bash, zsh, fish, and PowerShell
 - **Dry Run Mode** — Preview what will be created before writing files
 - **Custom Templates** — Bring your own templates from any directory
 - **JNI Convention Handling** — Automatic package name encoding for JNI bindings
+- **jni 0.22 Support** — All templates use the latest jni crate with `EnvUnowned` and error policies
 
 ## Installation
 
 > [!IMPORTANT]
-> Please use version **0.3.0** or later. Previous versions had issues with packaging (missing files on crates.io).
+> Please use version **0.3.2** or later for KMP template support and interactive project name prompts.
 
 ```bash
 cargo install android-rust-cli
@@ -35,14 +38,17 @@ cargo install android-rust-cli
 ## Quick Start
 
 ```bash
-# Create a new project (interactive mode)
+# Create a new project (fully interactive — prompts for name, template, package)
+android-rust new
+
+# Create with a specific name
 android-rust new my-app
 
 # Initialize in current directory
 android-rust init
 
-# Specify template and package name
-android-rust new my-app --template standard --package-name com.example.app
+# Specify everything via flags (non-interactive)
+android-rust new my-app --template kmp-mobile --package-name com.example.app
 
 # Preview without creating files
 android-rust new my-app --dry-run
@@ -56,12 +62,14 @@ android-rust list-templates
 ### `new` — Create a New Project
 
 ```bash
-android-rust new <name> [OPTIONS]
+android-rust new [NAME] [OPTIONS]
 ```
+
+When `NAME` is omitted, the CLI will interactively prompt for a project name.
 
 | Option | Description |
 |--------|-------------|
-| `--template <NAME>` | Template to use (standard, multi-module, bottom-nav) |
+| `--template <NAME>` | Template to use (standard, multi-module, kmp-mobile) |
 | `--package-name <PKG>` | Android package name (e.g., com.example.app) |
 | `--template-path <PATH>` | Use custom templates from directory |
 | `--force` | Overwrite existing files |
@@ -125,7 +133,21 @@ android-rust completions powershell > android-rust.ps1
 |----------|-------------|
 | `standard` | Basic Android + Rust JNI project with single module |
 | `multi-module` | Clean architecture with app, domain, and data modules |
-| `bottom-nav` | Bottom navigation layout with Jetpack Compose |
+| `kmp-mobile` | Kotlin Multiplatform (Android + iOS) with Rust via JNI and C FFI |
+
+### KMP Mobile Template
+
+The `kmp-mobile` template generates a full Kotlin Multiplatform project with:
+
+- **Compose Multiplatform** UI shared across Android and iOS
+- **Rust workspace** with three crates:
+  - `core` — Shared pure Rust logic
+  - `android` — JNI bindings (cdylib) using jni 0.22
+  - `ios` — C FFI bindings (staticlib) with header file
+- **Kotlin expect/actual** pattern for `RustBridge` across platforms
+- **iOS cinterop** setup with `.def` file and header includes
+- **Xcode project** ready for iOS builds
+- **Android Rust Gradle Plugin** integration for both Android and iOS Rust builds
 
 ## Custom Templates
 
@@ -142,7 +164,7 @@ android-rust new my-app --template-path /path/to/templates --template my-templat
 ### Creating Custom Templates
 
 1. Create a directory for your template
-2. Add a `template.toml` file:
+2. Add a `template.toml` file (optional):
 
 ```toml
 [template]
@@ -154,6 +176,7 @@ features = ["jni", "compose", "custom"]
    - `{{ package_name }}` — Package name (e.g., com.example.app)
    - `{{ package_path }}` — Package path (e.g., com/example/app)
    - `{{ jni_package }}` — JNI-encoded package (e.g., com_example_app)
+   - `{{ project_name }}` — Project/folder name (e.g., my-app)
 
 4. Use `__package_path__` in directory names to create package structure
 
@@ -166,6 +189,7 @@ android-rust new my-app --template standard --package-name com.mycompany.app
 ```
 
 Defaults when stdin is not a terminal:
+- Project name: `my-project`
 - Package: `dev.rodroid.rust`
 - Template: `standard` (if available)
 

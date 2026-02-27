@@ -14,6 +14,7 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 const DEFAULT_PACKAGE: &str = "dev.rodroid.rust";
+const DEFAULT_PROJECT_NAME: &str = "my-project";
 
 pub fn new_project(
     name: Option<PathBuf>,
@@ -23,7 +24,10 @@ pub fn new_project(
     force: bool,
     dry_run: bool,
 ) -> Result<()> {
-    let out_dir = name.unwrap_or_else(|| PathBuf::from("android-rust-example"));
+    let out_dir = match name {
+        Some(n) => n,
+        None => PathBuf::from(resolve_project_name()?),
+    };
     create_project(
         out_dir,
         template,
@@ -42,15 +46,6 @@ pub fn init_project(
     dry_run: bool,
 ) -> Result<()> {
     let out_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
-
-    // Default to "standard" if no template specified for init
-    // But we still allow selection if multiple available or if prompt needed?
-    // We can infer this in the resolution logic or pass a preference.
-    // For now let's keep it consistent: prompt if unsure, but if template is None, maybe default to standard?
-
-    // Actually, `resolve_template` defaults to standard if it's the only one OR non-interactive.
-    // Let's pass the template through.
-
     create_project(
         out_dir,
         template,
@@ -77,7 +72,11 @@ fn create_project(
 
     let template_source = resolve_template(template, template_path)?;
     let package_name = resolve_package_name(package_name)?;
-    let context = TemplateContext::new(package_name.clone());
+    let project_name = out_dir
+        .file_name()
+        .map(|n| n.to_string_lossy().to_string())
+        .unwrap_or_else(|| "my-project".to_string());
+    let context = TemplateContext::new(package_name.clone(), project_name);
 
     if dry_run {
         ui::print_dry_run_header();
@@ -212,6 +211,20 @@ fn resolve_package_name(package_name: Option<String>) -> Result<String> {
     }
 
     Ok(DEFAULT_PACKAGE.to_string())
+}
+
+fn resolve_project_name() -> Result<String> {
+    if std::io::stdin().is_terminal() {
+        println!();
+        let name: String = Input::new()
+            .with_prompt(format!("  {} Project name", style("?").cyan().bold()))
+            .default(DEFAULT_PROJECT_NAME.to_string())
+            .interact_text()
+            .map_err(|e| CliError::Other(e.into()))?;
+        return Ok(name);
+    }
+
+    Ok(DEFAULT_PROJECT_NAME.to_string())
 }
 
 fn is_dir_empty(path: &PathBuf) -> Result<bool> {
