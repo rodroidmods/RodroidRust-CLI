@@ -29,7 +29,7 @@ A command-line tool for scaffolding Android and Kotlin Multiplatform projects wi
 ## Installation
 
 > [!IMPORTANT]
-> Please use version **0.3.2** or later for KMP template support and interactive project name prompts.
+> Please use version **0.3.3** or later for KMP template support and interactive project name prompts.
 
 ```bash
 cargo install android-rust-cli
